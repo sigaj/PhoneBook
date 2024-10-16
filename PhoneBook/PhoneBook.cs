@@ -11,16 +11,16 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace KsiazkaTelefoniczna
+namespace PhoneBook
 {
     internal class PhoneBook
     {
-        private DatabaseHandler databaseHandler = null;
+        private DatabaseHandler database_handler = null;
         private Menu menu = null;
 
         public PhoneBook()
         {
-            databaseHandler = new DatabaseHandler();
+            database_handler = new DatabaseHandler();
             menu = new Menu();
             DisplayStartMenu();
         }
@@ -31,7 +31,7 @@ namespace KsiazkaTelefoniczna
         public void DisplayContacts(List<Contact> contacts = null)
         {
             Console.Clear();
-            contacts = contacts ?? databaseHandler.GetAllContacts();
+            contacts = contacts ?? database_handler.GetAllContacts();
             if (contacts.Count == 0)
             {
                 Console.WriteLine("brak kontaktoww, nacisnij jakikolwiek klawisz, aby wrocic");
@@ -62,7 +62,7 @@ namespace KsiazkaTelefoniczna
             Console.Write("numer telefonu: ");
             string phone_number = Console.ReadLine();
 
-            databaseHandler.AddContact(first_name, last_name, phone_number);
+            database_handler.AddContact(first_name, last_name, phone_number);
             DisplayContacts();
         }
         public void EditContact(Contact contact)
@@ -82,7 +82,7 @@ namespace KsiazkaTelefoniczna
             contact.LastName = new_last_name;
             contact.PhoneNumber = new_phone_number;
 
-            databaseHandler.EditContact(contact);
+            database_handler.EditContact(contact);
             DisplayContacts();
         }
         public void DeleteContact(Contact contact)
@@ -92,7 +92,7 @@ namespace KsiazkaTelefoniczna
             var key = Console.ReadKey(false).Key;
             if (key == ConsoleKey.T)
             {
-                databaseHandler.DeleteContact(contact);
+                database_handler.DeleteContact(contact);
                 DisplayContacts();
             }
             else
@@ -106,7 +106,7 @@ namespace KsiazkaTelefoniczna
             Console.Write("wprowadz imie, nazwisko lub numer telefonu do wyszukania: ");
             string search_query = Console.ReadLine();
 
-            List<Contact> found_contacts = databaseHandler.SearchContacts(search_query);
+            List<Contact> found_contacts = database_handler.SearchContacts(search_query);
 
             if (found_contacts.Count > 0)
             {

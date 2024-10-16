@@ -6,12 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace KsiazkaTelefoniczna
+namespace PhoneBook
 {
     internal class DatabaseHandler
     {
         private SQLiteConnection connection;
-        private string database_name = "ksiazkatelefoniczna.db";
+        private string database_name = "phone_book.db";
         private string table_name = "Contacts";
 
         public DatabaseHandler()
