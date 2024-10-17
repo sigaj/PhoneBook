@@ -33,7 +33,8 @@ namespace PhoneBook
                 ID INTEGER PRIMARY KEY AUTOINCREMENT, 
                 FirstName TEXT, 
                 LastName TEXT, 
-                PhoneNumber TEXT)";
+                PhoneNumber TEXT,
+                Address TEXT)";
 
             using (SQLiteCommand command = new SQLiteCommand(createTableSql, connection))
             {
@@ -51,34 +52,36 @@ namespace PhoneBook
             {
                 while (reader.Read())
                 {
-                    contacts.Add(new Contact(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3)));
+                    contacts.Add(new Contact(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4)));
                 }
             }
             return contacts;
         }
 
-        public void AddContact(string first_name, string last_name, string phone_number)
+        public void AddContact(string first_name, string last_name, string phone_number, string address)
         {
-            string addContactQuery = $"INSERT INTO {table_name}(FirstName, LastName, PhoneNumber) VALUES (@firstName, @lastName, @phoneNumber)";
+            string addContactQuery = $"INSERT INTO {table_name}(FirstName, LastName, PhoneNumber, Address) VALUES (@firstName, @lastName, @phoneNumber, @address)";
 
             using (SQLiteCommand command = new SQLiteCommand(addContactQuery, connection))
             {
                 command.Parameters.AddWithValue("@firstName", first_name);
                 command.Parameters.AddWithValue("@lastName", last_name);
                 command.Parameters.AddWithValue("@phoneNumber", phone_number);
+                command.Parameters.AddWithValue("@address", address);
                 command.ExecuteNonQuery();
             }
         }
 
         public void EditContact(Contact contact)
         {
-            string updateContactSql = $"UPDATE {table_name} SET FirstName = @firstName, LastName = @lastName, PhoneNumber = @phoneNumber WHERE ID = @id";
+            string updateContactSql = $"UPDATE {table_name} SET FirstName = @firstName, LastName = @lastName, PhoneNumber = @phoneNumber, Address = @address WHERE ID = @id";
 
             using (SQLiteCommand command = new SQLiteCommand(updateContactSql, connection))
             {
                 command.Parameters.AddWithValue("@firstName", contact.FirstName);
                 command.Parameters.AddWithValue("@lastName", contact.LastName);
                 command.Parameters.AddWithValue("@phoneNumber", contact.PhoneNumber);
+                command.Parameters.AddWithValue("@address", contact.Address);
                 command.Parameters.AddWithValue("@id", contact.ID);
                 command.ExecuteNonQuery();
             }
@@ -97,7 +100,7 @@ namespace PhoneBook
         public List<Contact> SearchContacts(string search_query)
         {
             List<Contact> contacts = new List<Contact>();
-            string query = $"SELECT * FROM {table_name} WHERE FirstName LIKE @searchQuery OR LastName LIKE @searchQuery OR PhoneNumber LIKE @searchQuery";
+            string query = $"SELECT * FROM {table_name} WHERE FirstName LIKE @searchQuery OR LastName LIKE @searchQuery OR PhoneNumber LIKE @searchQuery OR Address LIKE @searchQuery";
 
             using (SQLiteCommand command = new SQLiteCommand(query, connection))
             {
@@ -106,7 +109,7 @@ namespace PhoneBook
                 {
                     while (reader.Read())
                     {
-                        contacts.Add(new Contact(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3)));
+                        contacts.Add(new Contact(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4)));
                     }
                 }
             }

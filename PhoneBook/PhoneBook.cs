@@ -24,10 +24,6 @@ namespace PhoneBook
             menu = new Menu();
             DisplayStartMenu();
         }
-        public void DisplayContacts()
-        {
-            DisplayContacts(null);
-        }
         public void DisplayContacts(List<Contact> contacts = null)
         {
             Console.Clear();
@@ -39,18 +35,18 @@ namespace PhoneBook
                 DisplayStartMenu();
             }
             menu.DisplayMenu(contacts,
-                        contact => $"{contact.FirstName} {contact?.LastName} {contact?.PhoneNumber}",
-                        contact => DisplayContactOptions(contact), DisplayStartMenu);
+                    contact => $"{contact.FirstName} {contact?.LastName} {contact?.PhoneNumber}, {contact?.Address}",
+                    contact => DisplayContactOptions(contact), DisplayStartMenu);
         }
         public void DisplayContactOptions(Contact contact)
         {
-            Dictionary<string, Action> menuOptions = new Dictionary<string, Action>{
+            Dictionary<string, Action> menuOptions = new Dictionary<string, Action> {
                 { "edytuj", () => EditContact(contact) },
                 { "usun", () => DeleteContact(contact) },
             };
             menu.DisplayMenu(menuOptions.Keys.ToList(),
                         option => option,
-                        option => menuOptions[option].Invoke(), DisplayContacts);
+                        option => menuOptions[option].Invoke(), () => DisplayContacts(null));
         }
         public void AddContact()
         {
@@ -61,8 +57,10 @@ namespace PhoneBook
             string last_name = Console.ReadLine();
             Console.Write("numer telefonu: ");
             string phone_number = Console.ReadLine();
+            Console.Write("adres: ");
+            string address = Console.ReadLine();
 
-            database_handler.AddContact(first_name, last_name, phone_number);
+            database_handler.AddContact(first_name, last_name, phone_number, address);
             DisplayContacts();
         }
         public void EditContact(Contact contact)
@@ -77,10 +75,14 @@ namespace PhoneBook
             Console.Write("numer telefonu: ");
             SendKeys.SendWait(Regex.Replace(contact.PhoneNumber, "[+^%~()]", "{$0}"));
             string new_phone_number = Console.ReadLine();
+            Console.Write("adres: ");
+            SendKeys.SendWait(contact.Address);
+            string new_address = Console.ReadLine();
 
             contact.FirstName = new_first_name;
             contact.LastName = new_last_name;
             contact.PhoneNumber = new_phone_number;
+            contact.Address = new_address;
 
             database_handler.EditContact(contact);
             DisplayContacts();
@@ -124,11 +126,11 @@ namespace PhoneBook
         public void DisplayStartMenu()
         {
             Dictionary<string, Action> menuOptions = new Dictionary<string, Action> {
-                { "wyswietl kontakty", DisplayContacts },
+                { "wyswietl kontakty", () => DisplayContacts(null) },
                 { "dodaj kontakt", AddContact },
                 { "wyszukaj kontakt", SearchContacts },
             };
-            menu.DisplayMenu(menuOptions.Keys.ToList(), option => option, option => menuOptions[option].Invoke());
+            menu.DisplayMenu(menuOptions.Keys.ToList(), option => option, option => menuOptions[option].Invoke(), () => { return; });
         }
     }
 }

@@ -8,20 +8,26 @@ namespace PhoneBook
 {
     internal class Menu
     {
-        public void DisplayMenu<T>(List<T> items, Func<T, string> text, Action<T> callback, Action on_escape_callback = null)
+        public void DisplayMenu<T>(List<T> items, Func<T, string> text_formatter, Action<T> callback, Action on_escape_callback = null, int page_number = 1, int items_per_page = 10)
         {
             int currentIndex = 0;
 
             while (true)
             {
                 Console.Clear();
+                if (items.Count > items_per_page || page_number > 1)
+                {
+                    Console.WriteLine("uzyj strzalek, aby zmienic strone (←, →)");
+                    Console.WriteLine();
+                }
 
-                for (int i = 0; i < items.Count; i++)
+                var items_on_page = items.Skip((page_number - 1) * items_per_page).Take(items_per_page).ToList();
+                for (int i = 0; i < items_on_page.Count; i++)
                 {
                     if (i == currentIndex)
                         Console.ForegroundColor = ConsoleColor.Green;
 
-                    Console.WriteLine($"{i + 1}. {text(items[i])}");
+                    Console.WriteLine($"{i + (page_number - 1) * items_per_page + 1}. {text_formatter(items_on_page[i])}");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
 
@@ -30,17 +36,29 @@ namespace PhoneBook
                 switch (key)
                 {
                     case ConsoleKey.DownArrow:
-                        currentIndex = (currentIndex + 1) % items.Count;
+                        currentIndex = (currentIndex + 1) % items_on_page.Count;
                         break;
                     case ConsoleKey.UpArrow:
-                        currentIndex = (currentIndex - 1 + items.Count) % items.Count;
+                        currentIndex = (currentIndex - 1 + items_on_page.Count) % items_on_page.Count;
                         break;
                     case ConsoleKey.Enter:
-                        callback(items[currentIndex]);
+                        callback(items_on_page[currentIndex]);
                         return;
                     case ConsoleKey.Escape:
                         on_escape_callback?.Invoke();
                         return;
+                    case ConsoleKey.LeftArrow:
+                        if (page_number - 1 > 0)
+                        {
+                            DisplayMenu(items, text_formatter, callback, on_escape_callback, page_number - 1, items_per_page);
+                        }
+                        break;
+                    case ConsoleKey.RightArrow:
+                        if (page_number + 1 <= ((items.Count / items_per_page) + 1))
+                        {
+                            DisplayMenu(items, text_formatter, callback, on_escape_callback, page_number + 1, items_per_page);
+                        }
+                        break;
                 }
             }
         }
