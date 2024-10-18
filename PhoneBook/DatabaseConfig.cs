@@ -17,9 +17,8 @@ namespace KsiazkaTelefoniczna
         public static DatabaseConfig LoadConfig(string file_path)
         {
             string json_string;
-            if (!File.Exists(file_path))
+            if (!File.Exists(file_path) || new FileInfo(file_path).Length == 0)
             {
-                File.Create(file_path);
                 File.WriteAllText(file_path, @"{
                     ""DatabaseType"": ""MySQL"",
                     ""MySQL"": {
@@ -38,7 +37,9 @@ namespace KsiazkaTelefoniczna
             try
             {
                 json_string = File.ReadAllText(file_path);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex)
+            {
                 Console.WriteLine("bład z plikiem konfiguracyjnym");
                 throw ex;
             }

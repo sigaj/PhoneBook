@@ -24,8 +24,6 @@ namespace PhoneBook
     {
         private SQLiteConnection connection;
         private SQLiteConfig config;
-        private string database_name = "phone_book.db";
-        private string table_name = "Contacts";
 
         public SQLiteHandler(SQLiteConfig config)
         {
@@ -35,22 +33,22 @@ namespace PhoneBook
 
         public void Connect()
         {
-            if (!File.Exists(database_name))
+            if (!File.Exists(config.DatabaseName))
             {
-                SQLiteConnection.CreateFile(database_name);
+                SQLiteConnection.CreateFile(config.DatabaseName);
             }
 
-            connection = new SQLiteConnection($"Data Source={database_name};Version=3;");
+            connection = new SQLiteConnection($"Data Source={config.DatabaseName};Version=3;");
             connection.Open();
 
-            string createTableSql = $@"CREATE TABLE IF NOT EXISTS {table_name} (
+            string create_table_sql = $@"CREATE TABLE IF NOT EXISTS {config.TableName} (
                 ID INTEGER PRIMARY KEY AUTOINCREMENT, 
                 FirstName TEXT, 
                 LastName TEXT, 
                 PhoneNumber TEXT,
                 Address TEXT)";
 
-            using (SQLiteCommand command = new SQLiteCommand(createTableSql, connection))
+            using (SQLiteCommand command = new SQLiteCommand(create_table_sql, connection))
             {
                 command.ExecuteNonQuery();
             }
@@ -59,7 +57,7 @@ namespace PhoneBook
         public List<Contact> GetAllContacts()
         {
             List<Contact> contacts = new List<Contact>();
-            string sql = $"SELECT * FROM {table_name}";
+            string sql = $"SELECT * FROM {config.TableName}";
 
             using (SQLiteCommand command = new SQLiteCommand(sql, connection))
             using (SQLiteDataReader reader = command.ExecuteReader())
@@ -74,9 +72,9 @@ namespace PhoneBook
 
         public void AddContact(string first_name, string last_name, string phone_number, string address)
         {
-            string addContactQuery = $"INSERT INTO {table_name}(FirstName, LastName, PhoneNumber, Address) VALUES (@firstName, @lastName, @phoneNumber, @address)";
+            string add_contact_sql = $"INSERT INTO {config.TableName}(FirstName, LastName, PhoneNumber, Address) VALUES (@firstName, @lastName, @phoneNumber, @address)";
 
-            using (SQLiteCommand command = new SQLiteCommand(addContactQuery, connection))
+            using (SQLiteCommand command = new SQLiteCommand(add_contact_sql, connection))
             {
                 command.Parameters.AddWithValue("@firstName", first_name);
                 command.Parameters.AddWithValue("@lastName", last_name);
@@ -88,9 +86,9 @@ namespace PhoneBook
 
         public void EditContact(Contact contact)
         {
-            string updateContactSql = $"UPDATE {table_name} SET FirstName = @firstName, LastName = @lastName, PhoneNumber = @phoneNumber, Address = @address WHERE ID = @id";
+            string update_contact_sql = $"UPDATE {config.TableName} SET FirstName = @firstName, LastName = @lastName, PhoneNumber = @phoneNumber, Address = @address WHERE ID = @id";
 
-            using (SQLiteCommand command = new SQLiteCommand(updateContactSql, connection))
+            using (SQLiteCommand command = new SQLiteCommand(update_contact_sql, connection))
             {
                 command.Parameters.AddWithValue("@firstName", contact.FirstName);
                 command.Parameters.AddWithValue("@lastName", contact.LastName);
@@ -103,9 +101,9 @@ namespace PhoneBook
 
         public void DeleteContact(Contact contact)
         {
-            string deleteContactSql = $"DELETE FROM {table_name} WHERE ID = @id";
+            string delete_contact_sql = $"DELETE FROM {config.TableName} WHERE ID = @id";
 
-            using (SQLiteCommand command = new SQLiteCommand(deleteContactSql, connection))
+            using (SQLiteCommand command = new SQLiteCommand(delete_contact_sql, connection))
             {
                 command.Parameters.AddWithValue("@id", contact.ID);
                 command.ExecuteNonQuery();
@@ -114,9 +112,9 @@ namespace PhoneBook
         public List<Contact> SearchContacts(string search_query)
         {
             List<Contact> contacts = new List<Contact>();
-            string query = $"SELECT * FROM {table_name} WHERE FirstName LIKE @searchQuery OR LastName LIKE @searchQuery OR PhoneNumber LIKE @searchQuery OR Address LIKE @searchQuery";
+            string search_contact_sql = $"SELECT * FROM {config.TableName} WHERE FirstName LIKE @searchQuery OR LastName LIKE @searchQuery OR PhoneNumber LIKE @searchQuery OR Address LIKE @searchQuery";
 
-            using (SQLiteCommand command = new SQLiteCommand(query, connection))
+            using (SQLiteCommand command = new SQLiteCommand(search_contact_sql, connection))
             {
                 command.Parameters.AddWithValue("@searchQuery", $"%{search_query}%");
                 using (SQLiteDataReader reader = command.ExecuteReader())
@@ -136,7 +134,6 @@ namespace PhoneBook
     {
         private MySqlConnection connection;
         private MySQLConfig config;
-        private string connectionString;
 
         public MySQLHandler(MySQLConfig config)
         {
@@ -146,8 +143,16 @@ namespace PhoneBook
 
         public void Connect()
         {
-            connection = new MySqlConnection($"server={config.Server};database={config.Database};user={config.User};password={config.Password};");
-            connection.Open();
+            try
+            {
+                connection = new MySqlConnection($"server={config.Server};database={config.Database};user={config.User};password={config.Password};");
+                connection.Open();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return;
+            }
 
             string create_table_sql = $@"CREATE TABLE IF NOT EXISTS `contacts` (
               `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -181,9 +186,9 @@ namespace PhoneBook
 
         public void AddContact(string first_name, string last_name, string phone_number, string address)
         {
-            string addContactQuery = $"INSERT INTO {config.TableName}(FirstName, LastName, PhoneNumber, Address) VALUES (@firstName, @lastName, @phoneNumber, @address)";
+            string add_contact_query = $"INSERT INTO {config.TableName}(FirstName, LastName, PhoneNumber, Address) VALUES (@firstName, @lastName, @phoneNumber, @address)";
 
-            using (MySqlCommand command = new MySqlCommand(addContactQuery, connection))
+            using (MySqlCommand command = new MySqlCommand(add_contact_query, connection))
             {
                 command.Parameters.AddWithValue("@firstName", first_name);
                 command.Parameters.AddWithValue("@lastName", last_name);
@@ -195,9 +200,9 @@ namespace PhoneBook
 
         public void EditContact(Contact contact)
         {
-            string updateContactSql = $"UPDATE {config.TableName} SET FirstName = @firstName, LastName = @lastName, PhoneNumber = @phoneNumber, Address = @address WHERE ID = @id";
+            string update_contact_sql = $"UPDATE {config.TableName} SET FirstName = @firstName, LastName = @lastName, PhoneNumber = @phoneNumber, Address = @address WHERE ID = @id";
 
-            using (MySqlCommand command = new MySqlCommand(updateContactSql, connection))
+            using (MySqlCommand command = new MySqlCommand(update_contact_sql, connection))
             {
                 command.Parameters.AddWithValue("@firstName", contact.FirstName);
                 command.Parameters.AddWithValue("@lastName", contact.LastName);
@@ -210,9 +215,9 @@ namespace PhoneBook
 
         public void DeleteContact(Contact contact)
         {
-            string deleteContactSql = $"DELETE FROM {config.TableName} WHERE ID = @id";
+            string delete_contact_sql = $"DELETE FROM {config.TableName} WHERE ID = @id";
 
-            using (MySqlCommand command = new MySqlCommand(deleteContactSql, connection))
+            using (MySqlCommand command = new MySqlCommand(delete_contact_sql, connection))
             {
                 command.Parameters.AddWithValue("@id", contact.ID);
                 command.ExecuteNonQuery();
@@ -222,9 +227,9 @@ namespace PhoneBook
         public List<Contact> SearchContacts(string search_query)
         {
             List<Contact> contacts = new List<Contact>();
-            string query = $"SELECT * FROM {config.TableName} WHERE FirstName LIKE @searchQuery OR LastName LIKE @searchQuery OR PhoneNumber LIKE @searchQuery OR Address LIKE @searchQuery";
+            string search_contact_sql = $"SELECT * FROM {config.TableName} WHERE FirstName LIKE @searchQuery OR LastName LIKE @searchQuery OR PhoneNumber LIKE @searchQuery OR Address LIKE @searchQuery";
 
-            using (MySqlCommand command = new MySqlCommand(query, connection))
+            using (MySqlCommand command = new MySqlCommand(search_contact_sql, connection))
             {
                 command.Parameters.AddWithValue("@searchQuery", $"%{search_query}%");
                 using (MySqlDataReader reader = command.ExecuteReader())
