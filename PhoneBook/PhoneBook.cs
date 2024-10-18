@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KsiazkaTelefoniczna;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics.Contracts;
@@ -15,12 +16,24 @@ namespace PhoneBook
 {
     internal class PhoneBook
     {
-        private DatabaseHandler database_handler = null;
+        private IDatabaseHandler database_handler = null;
         private Menu menu = null;
 
         public PhoneBook()
         {
-            database_handler = new DatabaseHandler();
+            var database_config = DatabaseConfig.LoadConfig("database_config.json");
+            if (database_config.DatabaseType.ToLower() == "mysql")
+            {
+                database_handler = new MySQLHandler(database_config.MySQL);
+            }
+            else if (database_config.DatabaseType.ToLower() == "sqlite")
+            {
+                database_handler = new SQLiteHandler(database_config.SQLite);
+            }
+            else
+            {
+                Console.WriteLine("nieznana baza danych, obslugiwane bazy to mysql i sqlite");
+            }
             menu = new Menu();
             DisplayStartMenu();
         }

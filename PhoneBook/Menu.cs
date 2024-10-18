@@ -30,6 +30,14 @@ namespace PhoneBook
                     Console.WriteLine($"{i + (page_number - 1) * items_per_page + 1}. {text_formatter(items_on_page[i])}");
                     Console.ForegroundColor = ConsoleColor.White;
                 }
+                if (items.Count > items_per_page || page_number > 1)
+                {
+                    for (int i = 0; i < items_per_page - items_on_page.Count + 1; i++)
+                    {
+                        Console.WriteLine();
+                    }
+                    Console.WriteLine($"strona {page_number} z {(items.Count / items_per_page) + 1}");
+                }
 
                 var key = Console.ReadKey(true).Key;
 
