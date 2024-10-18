@@ -20,7 +20,7 @@ namespace KsiazkaTelefoniczna
             if (!File.Exists(file_path) || new FileInfo(file_path).Length == 0)
             {
                 File.WriteAllText(file_path, @"{
-                    ""DatabaseType"": ""MySQL"",
+                    ""DatabaseType"": ""SQLite"",
                     ""MySQL"": {
                         ""Server"": ""localhost"",
                         ""Database"": ""phone_book"",
