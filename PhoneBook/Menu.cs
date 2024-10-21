@@ -62,7 +62,7 @@ namespace PhoneBook
                         }
                         break;
                     case ConsoleKey.RightArrow:
-                        if (page_number + 1 <= ((items.Count / items_per_page) + 1))
+                        if (page_number <= ((items.Count / items_per_page)))
                         {
                             DisplayMenu(items, text_formatter, callback, on_escape_callback, page_number + 1, items_per_page);
                         }

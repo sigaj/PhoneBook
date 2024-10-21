@@ -21,18 +21,29 @@ namespace PhoneBook
 
         public PhoneBook()
         {
-            var database_config = DatabaseConfig.LoadConfig("database_config.json");
-            if (database_config.DatabaseType.ToLower() == "mysql")
+            try
             {
-                database_handler = new MySQLHandler(database_config.MySQL);
-            }
-            else if (database_config.DatabaseType.ToLower() == "sqlite")
+                var database_config = DatabaseConfig.LoadConfig("database_config.json");
+                if (database_config.DatabaseType.ToLower() == "mysql")
+                {
+                    database_handler = new MySQLHandler(database_config.MySQL);
+                }
+                else if (database_config.DatabaseType.ToLower() == "sqlite")
+                {
+                    database_handler = new SQLiteHandler(database_config.SQLite);
+                }
+                else
+                {
+                    Console.WriteLine("nieznana baza danych, obslugiwane bazy to mysql i sqlite");
+                    return;
+                }
+                database_handler.Connect();
+            } catch (Exception ex)
             {
-                database_handler = new SQLiteHandler(database_config.SQLite);
-            }
-            else
-            {
-                Console.WriteLine("nieznana baza danych, obslugiwane bazy to mysql i sqlite");
+                Console.WriteLine("wystapil problem z polaczeniem z baza danych. sprawdz poprawnosc danych bazy");
+                Console.WriteLine("Nazwa bledu: ");
+                Console.WriteLine(ex.Message);
+                return;
             }
             menu = new Menu();
             DisplayStartMenu();
@@ -40,7 +51,16 @@ namespace PhoneBook
         public void DisplayContacts(List<Contact> contacts = null)
         {
             Console.Clear();
-            contacts = contacts ?? database_handler.GetAllContacts();
+            try
+            {
+                contacts = contacts ?? database_handler.GetAllContacts();
+            } catch (Exception ex)
+            {
+                Console.WriteLine("Wystapil blad z polaczeniem z baza danycGGGGh");
+                Console.WriteLine("Nazwa bledu: ");
+                Console.WriteLine(ex);
+                return;
+            }
             if (contacts.Count == 0)
             {
                 Console.WriteLine("brak kontaktoww, nacisnij jakikolwiek klawisz, aby wrocic");

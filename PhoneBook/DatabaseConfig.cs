@@ -34,15 +34,7 @@ namespace KsiazkaTelefoniczna
                     }
                 }");
             }
-            try
-            {
-                json_string = File.ReadAllText(file_path);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("bład z plikiem konfiguracyjnym");
-                throw ex;
-            }
+            json_string = File.ReadAllText(file_path);
             return JsonSerializer.Deserialize<DatabaseConfig>(json_string);
         }
     }

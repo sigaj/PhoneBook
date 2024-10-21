@@ -6,7 +6,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Data.SqlClient;
-using MySqlConnector;
+using MySql.Data;
+using MySql.Data.MySqlClient;
 using KsiazkaTelefoniczna;
 
 namespace PhoneBook
@@ -28,7 +29,6 @@ namespace PhoneBook
         public SQLiteHandler(SQLiteConfig config)
         {
             this.config = config;
-            Connect();
         }
 
         public void Connect()
@@ -64,7 +64,12 @@ namespace PhoneBook
             {
                 while (reader.Read())
                 {
-                    contacts.Add(new Contact(reader.GetInt32(0), reader.GetString(1), reader.GetString(2), reader.GetString(3), reader.GetString(4)));
+                    Console.WriteLine(reader.GetOrdinal("ID"));
+                    Console.WriteLine(reader?.GetOrdinal("FirstName"));
+                    Console.WriteLine(reader?.GetOrdinal("LastName"));
+                    Console.WriteLine(reader?.GetOrdinal("PhoneNumber"));
+                    Console.WriteLine(reader?.GetOrdinal("Address"));
+                    contacts.Add(new Contact(reader.GetInt32(0), reader?.GetString(1) ?? "", reader?.GetString(2) ?? "", reader?.GetString(3) ?? "", reader?.GetString(4) ?? ""));
                 }
             }
             return contacts;
@@ -138,21 +143,12 @@ namespace PhoneBook
         public MySQLHandler(MySQLConfig config)
         {
             this.config = config;
-            Connect();
         }
 
         public void Connect()
         {
-            try
-            {
-                connection = new MySqlConnection($"server={config.Server};database={config.Database};user={config.User};password={config.Password};");
-                connection.Open();
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                return;
-            }
+            connection = new MySqlConnection($"server={config.Server};database={config.Database};user={config.User};password={config.Password};");
+            connection.Open();
 
             string create_table_sql = $@"CREATE TABLE IF NOT EXISTS `contacts` (
               `ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -172,6 +168,7 @@ namespace PhoneBook
         {
             List<Contact> contacts = new List<Contact>();
             string sql = $"SELECT * FROM {config.TableName}";
+
 
             using (MySqlCommand command = new MySqlCommand(sql, connection))
             using (MySqlDataReader reader = command.ExecuteReader())
