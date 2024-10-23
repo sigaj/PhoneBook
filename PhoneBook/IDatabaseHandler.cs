@@ -64,12 +64,18 @@ namespace PhoneBook
             {
                 while (reader.Read())
                 {
-                    Console.WriteLine(reader.GetOrdinal("ID"));
-                    Console.WriteLine(reader?.GetOrdinal("FirstName"));
-                    Console.WriteLine(reader?.GetOrdinal("LastName"));
-                    Console.WriteLine(reader?.GetOrdinal("PhoneNumber"));
-                    Console.WriteLine(reader?.GetOrdinal("Address"));
-                    contacts.Add(new Contact(reader.GetInt32(0), reader?.GetString(1) ?? "", reader?.GetString(2) ?? "", reader?.GetString(3) ?? "", reader?.GetString(4) ?? ""));
+                    int id_index = reader.GetOrdinal("ID");
+                    int first_name_index = reader.GetOrdinal("FirstName");
+                    int last_name_index = reader.GetOrdinal("LastName");
+                    int phone_number_index = reader.GetOrdinal("PhoneNumber");
+                    int address_index = reader.GetOrdinal("Address");
+
+                    int id = !reader.IsDBNull(id_index) ? reader.GetInt32(reader.GetOrdinal("ID")) : -1;
+                    string first_name = !reader.IsDBNull(first_name_index) ? reader.GetString(first_name_index) : "";
+                    string last_name = !reader.IsDBNull(last_name_index) ? reader.GetString(last_name_index) : "";
+                    string phone_number = !reader.IsDBNull(phone_number_index) ? reader.GetString(phone_number_index) : "";
+                    string address = !reader.IsDBNull(address_index) ? reader.GetString(address_index) : "";
+                    contacts.Add(new Contact(id, first_name, last_name, phone_number, address));
                 }
             }
             return contacts;
