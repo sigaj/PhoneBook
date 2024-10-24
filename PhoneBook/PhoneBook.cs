@@ -65,8 +65,8 @@ namespace PhoneBook
                 DisplayStartMenu();
             }
             menu.DisplayMenu(contacts,
-                    contact => $"{contact.FirstName} {contact?.LastName} {contact?.PhoneNumber}, {contact?.Address}",
-                    contact => DisplayContactOptions(contact), DisplayStartMenu);
+                contact => $"{contact.FirstName} {contact?.LastName} {contact?.PhoneNumber}, {contact?.Address}",
+                contact => DisplayContactOptions(contact), DisplayStartMenu);
         }
         public void DisplayContactOptions(Contact contact)
         {
@@ -75,8 +75,8 @@ namespace PhoneBook
                 { "usun", () => DeleteContact(contact) },
             };
             menu.DisplayMenu(menu_options.Keys.ToList(),
-                        option => option,
-                        option => menu_options[option].Invoke(), () => DisplayContacts(null));
+                option => option,
+                option => menu_options[option].Invoke(), () => DisplayContacts(null));
         }
         public void AddContact()
         {
@@ -157,10 +157,13 @@ namespace PhoneBook
         {
             Dictionary<string, Action> menu_options = new Dictionary<string, Action> {
                 { "wyswietl kontakty", () => DisplayContacts(null) },
-                { "dodaj kontakt", AddContact },
-                { "wyszukaj kontakt", SearchContacts },
+                { "dodaj kontakt", () => AddContact() },
+                { "wyszukaj kontakt", () => SearchContacts() },
             };
-            menu.DisplayMenu(menu_options.Keys.ToList(), option => option, option => menu_options[option].Invoke(), () => { return; });
+            menu.DisplayMenu(menu_options.Keys.ToList(),
+                option => option,
+                option => menu_options[option].Invoke(),
+                () => Environment.Exit(0));
         }
     }
 }
