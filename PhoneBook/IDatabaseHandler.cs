@@ -8,7 +8,6 @@ using System.IO;
 using System.Data.SqlClient;
 using MySql.Data;
 using MySql.Data.MySqlClient;
-using KsiazkaTelefoniczna;
 
 namespace PhoneBook
 {
@@ -80,7 +79,6 @@ namespace PhoneBook
             }
             return contacts;
         }
-
         public void AddContact(string first_name, string last_name, string phone_number, string address)
         {
             string add_contact_sql = $"INSERT INTO {config.TableName}(FirstName, LastName, PhoneNumber, Address) VALUES (@firstName, @lastName, @phoneNumber, @address)";
@@ -186,7 +184,6 @@ namespace PhoneBook
             }
             return contacts;
         }
-
         public void AddContact(string first_name, string last_name, string phone_number, string address)
         {
             string add_contact_query = $"INSERT INTO {config.TableName}(FirstName, LastName, PhoneNumber, Address) VALUES (@firstName, @lastName, @phoneNumber, @address)";

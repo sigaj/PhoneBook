@@ -1,12 +1,10 @@
-﻿using KsiazkaTelefoniczna;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics.Contracts;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting.Contexts;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -17,7 +15,7 @@ namespace PhoneBook
     internal class PhoneBook
     {
         private IDatabaseHandler database_handler = null;
-        private Menu menu = null;
+        private Menu menu = new Menu();
 
         public PhoneBook()
         {
@@ -45,7 +43,6 @@ namespace PhoneBook
                 Console.WriteLine(ex.Message);
                 return;
             }
-            menu = new Menu();
             DisplayStartMenu();
         }
         public void DisplayContacts(List<Contact> contacts = null)
@@ -53,10 +50,10 @@ namespace PhoneBook
             Console.Clear();
             try
             {
-                contacts = contacts ?? database_handler.GetAllContacts();
+                contacts = contacts ?? database_handler.GetAllContacts(); 
             } catch (Exception ex)
             {
-                Console.WriteLine("Wystapil blad z polaczeniem z baza danycGGGGh");
+                Console.WriteLine("Wystapil blad z polaczeniem z baza danych");
                 Console.WriteLine("Nazwa bledu: ");
                 Console.WriteLine(ex);
                 return;
@@ -73,13 +70,13 @@ namespace PhoneBook
         }
         public void DisplayContactOptions(Contact contact)
         {
-            Dictionary<string, Action> menuOptions = new Dictionary<string, Action> {
+            Dictionary<string, Action> menu_options = new Dictionary<string, Action> {
                 { "edytuj", () => EditContact(contact) },
                 { "usun", () => DeleteContact(contact) },
             };
-            menu.DisplayMenu(menuOptions.Keys.ToList(),
+            menu.DisplayMenu(menu_options.Keys.ToList(),
                         option => option,
-                        option => menuOptions[option].Invoke(), () => DisplayContacts(null));
+                        option => menu_options[option].Invoke(), () => DisplayContacts(null));
         }
         public void AddContact()
         {
@@ -158,12 +155,12 @@ namespace PhoneBook
 
         public void DisplayStartMenu()
         {
-            Dictionary<string, Action> menuOptions = new Dictionary<string, Action> {
+            Dictionary<string, Action> menu_options = new Dictionary<string, Action> {
                 { "wyswietl kontakty", () => DisplayContacts(null) },
                 { "dodaj kontakt", AddContact },
                 { "wyszukaj kontakt", SearchContacts },
             };
-            menu.DisplayMenu(menuOptions.Keys.ToList(), option => option, option => menuOptions[option].Invoke(), () => { return; });
+            menu.DisplayMenu(menu_options.Keys.ToList(), option => option, option => menu_options[option].Invoke(), () => { return; });
         }
     }
 }
